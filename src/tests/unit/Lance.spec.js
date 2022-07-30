@@ -65,5 +65,21 @@ describe('Um lance com valor mínimo', () => {
         const lancesEmitidos = wrapper.emitted('novo-lance'); //Escuta evento novo-lance
         const valorLance = parseInt(lancesEmitidos[0][0]);
         expect(valorLance).toBe(400); //Espera que valorLance seja igual a 400
-    })
+    });
+
+    test('Não são aceitos lances com valores menores do que o mínimo informado', async () => {
+        const wrapper = mount(Lance, {
+            propsData: {
+                lanceMinimo: 300 //Valor mínimo para ser aceito
+            }
+        });
+        const input = wrapper.find('input');
+        input.setValue(100); //Informando valor menor que 300
+        wrapper.trigger('submit'); //Envia formulário
+
+        await wrapper.vm.$nextTick();
+        const erroMsg = wrapper.find('p.alert').element.textContent; //Captura alert de erro (classe passada na tag <p />)
+        const msgEsperada = "O valor mínimo para o lance é de R$ 300";
+        expect(erroMsg).toContain(msgEsperada); //Espera que o alerta exista caso o valor seja menos do mínimo esperado
+    });
 });
